@@ -60,10 +60,35 @@ function element_validate_phrase($element) {
     }
 }
 
+function shift_letter($character, $shift) {
+    $char_ascii = ord($character);
+    $shifted_char = ($char_ascii + $shift) % 26; //26 alphabetical characters
+    return chr($shifted_char);
+}
+
 function calculate_cipher($shift, $direction, $phrase)
 {
-    $test = strval($shift) . strval($direction) . strval($phrase);
-    return $test;
+    $shift = intval($shift);
+    switch ($direction) {
+        case 'left':
+            $shift = -$shift;
+            break;
+        default:
+            break;
+    }
+
+    $shifted_phrase = "";
+
+    for ($char_index = 0; $char_index < count($phrase); $char_index++) {
+        $current_char = $phrase[$char_index];
+        if (preg_match('/[a-zA-Z]/' , $current_char)) {
+            $shifted_phrase = $shifted_phrase . shift_letter($current_char, $shift);
+        }
+        else {
+            $shifted_phrase = $shifted_phrase . $current_char;
+        }
+    }
+    return $shifted_phrase;
 }
 
 function cipher_form_submit($form, &$form_state) {
@@ -75,11 +100,10 @@ function cipher_form_submit($form, &$form_state) {
 
     $_SESSION['cipher_output'] = $cipher_output;
 
-
     $form_state['redirect'] = 'cipher_success_page';
 }
 
 function cipher_success() {
     $answer = $_SESSION['cipher_output'];
-    return 'Your shifted phrase is: ' . $answer;
+    return 'Your shifted phrase is: ' . strtolower($answer);
 }
