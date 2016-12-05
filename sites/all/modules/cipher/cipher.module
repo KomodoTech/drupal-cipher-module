@@ -48,13 +48,13 @@ function cipher_form() {
 }
 
 function element_validate_direction($element) {
-    if ($element['#value'] != 'left' || $element['#value'] != 'right') {
+    if (!($element['#value'] === 'left' || $element['#value'] === 'right')) {
         form_error($element, t('Please enter either left or right'));
     }
 }
 
 function element_validate_phrase($element) {
-    $pattern_mostly_alpha = '/^[a-zA-z]\040\P*';
+    $pattern_mostly_alpha = '/^[A-Z\'".?! ]+$/i';
     if (preg_match($pattern_mostly_alpha, $element['#value'])) {
         echo('Phrase seems fine');
     }
