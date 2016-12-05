@@ -61,33 +61,117 @@ function element_validate_phrase($element) {
 }
 
 
-
-
-function ordutf8($char)
-{
-    $code = ord($char);
-    if ($code >= 128) {        //otherwise 0xxxxxxx
-        if ($code < 224) {
-            $bytesnumber = 2;       //110xxxxx
-        }
-        else if ($code < 240) {
-            $bytesnumber = 3;        //1110xxxx
-         }
-        else if ($code < 248) {
-            $bytesnumber = 4;    //11110xxx
-        }
-
-        $code = $code - 192 - ($bytesnumber > 2 ? 32 : 0) - ($bytesnumber > 3 ? 16 : 0);
-    }
-    return $code;
-}
-
-
 function shift_letter($character, $shift) {
-    $char_unicode = ordutf8($character);
-    $shifted_char = ($char_unicode + $shift) % 26; //26 alphabetical characters
+    $char_ascii = ord($character);
 
-    var_dump($char_unicode);
+    $alphabet_size = 26;
+
+    $A_ascii = 65;
+    $Z_ascii = 90;
+
+    $a_ascii = 97;
+    $z_ascii = 122;
+
+    $shift = $shift % $alphabet_size; // normalize to stay in range of alphabetical characters
+    $shifted_char = NULL;
+
+    if ($char_ascii >= $A_ascii && $char_ascii <= $Z_ascii) {
+
+        /*
+            CASES:
+
+                Shift Left (NEGATIVE):
+
+                    Result < 65:
+
+                            i = 68 ("D")
+                            s = -23
+
+                            i + s = 68 - 23 = 45
+
+                            h = max - (i + s) = 90 - 45 = 45
+
+                            l = min - (i + s) = 65 - 45 = 20
+
+                            t = f(h, l) = 20
+
+                            r = max - t = 90 - 20 = 70
+
+                            SHOULD END AT 70 ("F")
+
+                    Result = 65:
+
+                            i = 70 ("F")
+                            s = -5
+
+                            i + s = 70 - 5 = 65
+
+                            h = max - (i + s) = 90 - 65 = 25
+
+                            l = min - (i + s) = 65 - 65 = 0
+
+                            t = f(h, l) = 25
+
+                            r = max - t = 65
+
+                            SHOULD END AT 65 ("A")
+
+                    Result > 65:
+
+                            i = 80 ("P")
+                            s = -12
+
+                            i + s = 80 - 12 = 68
+
+                            h = max - (i + s) = 90 - 68 = 22
+
+                            l = min - (i + s) = 65 - 68 = -3
+
+                            t = f(h, l) = 22
+
+                            r = max - t = 68
+
+                            SHOULD END AT 68 ("D")
+
+
+
+                Shift Right (POSITIVE):
+
+                    Result > 90:
+
+                    Result = 90:
+
+                    Result < 90:
+        */
+
+        // 68 - 15 = 53
+        // 68 % 65 = 3
+        // 3 - 15 = 12
+        // 122 - 12 = 110
+
+        // 68 - 3 = 65
+        // 65 % 65 = 0
+
+
+        // 68 + 23 = 91
+        // 91 % 90 = 1
+        // 65 + 1 = 66
+
+        // 86 - 23 = 63
+        // 63 % 65 = -2
+        // 122 - 2 = 120
+
+
+
+        $shifted_char = ($char_ascii + $shift);
+    }
+    else if ($char_ascii >= $a_ascii && $char_ascii <= $z_ascii) {
+
+        // $shifted_char = ;
+
+    }
+
+    var_dump($char_ascii);
     var_dump($shifted_char);
     var_dump(chr($shifted_char));
     exit;
