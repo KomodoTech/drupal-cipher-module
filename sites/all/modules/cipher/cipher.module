@@ -1,0 +1,88 @@
+<?php
+
+function cipher_menu() {
+    $items['cipher'] = array(
+        'title' => 'Cipher Shift Example',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('cipher_form'),
+        'access callback' => TRUE,
+        'type' => MENU_NORMAL_ITEM,
+    );
+    $items['cipher_success_page'] = array(
+        'title' => 'Shifted Input',
+        'page callback' => 'cipher_success',
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK,
+    );
+    return $items;
+}
+
+function cipher_form() {
+    $form['shift_value'] = array(
+        '#title' => 'Shift value',
+        '#type' => 'textfield',
+        '#description' => t('Please enter your shift number.'),
+        '#element_validate' => array('element_validate_integer_positive'),
+        '#required' => TRUE,
+    );
+    $form['shift_direction'] = array(
+        '#title' => 'Shift direction',
+        '#type' => 'textfield',
+        '#description' => t('Please enter a direction (either left or right).'),
+        '#element_validate' => array('element_validate_direction'),
+        '#required' => TRUE,
+    );
+    $form['phrase_input'] = array(
+        '#title' => 'Phrase Input',
+        '#type' => 'textfield',
+        '#description' => t('Please enter a phrase you wish to shift.'),
+        '#element_validate' => array('element_validate_phrase'),
+        '#required' => TRUE,
+    );
+    $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => 'Generate Cipher',
+    );
+
+    return $form;
+}
+
+function element_validate_direction($element) {
+    if ($element['#value'] != 'left' || $element['#value'] != 'right') {
+        form_error($element, t('Please enter either left or right'));
+    }
+}
+
+function element_validate_phrase($element) {
+    $pattern_mostly_alpha = '/^[a-zA-z]\040\P*';
+    if (preg_match($pattern_mostly_alpha, $element['#value'])) {
+        echo('Phrase seems fine');
+    }
+    else {
+        form_error($element, t('Please do not use special characters that are not space or punctuation characters'));
+    }
+}
+
+function calculate_cipher($shift, $direction, $phrase)
+{
+    $test = strval($shift) . strval($direction) . strval($phrase);
+    return $test;
+}
+
+function cipher_form_submit($form, &$form_state) {
+    $shift_value = $form_state['values']['shift_value'];
+    $shift_direction = $form_state['values']['shift_direction'];
+    $phrase_input = $form_state['values']['phrase_input'];
+
+    $cipher_output = calculate_cipher($shift_value, $shift_direction, $phrase_input);
+
+    $_SESSION['cipher_output'] = $cipher_output;
+
+
+    $form_state['redirect'] = 'cipher_success_page';
+}
+
+function sum_success() {
+    $answer = $_SESSION['cipher_output'];
+    return 'Your shifted phrase is: ' . $answer;
+}
