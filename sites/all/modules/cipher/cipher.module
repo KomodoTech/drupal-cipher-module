@@ -60,9 +60,38 @@ function element_validate_phrase($element) {
     }
 }
 
+
+
+
+function ordutf8($char)
+{
+    $code = ord($char);
+    if ($code >= 128) {        //otherwise 0xxxxxxx
+        if ($code < 224) {
+            $bytesnumber = 2;       //110xxxxx
+        }
+        else if ($code < 240) {
+            $bytesnumber = 3;        //1110xxxx
+         }
+        else if ($code < 248) {
+            $bytesnumber = 4;    //11110xxx
+        }
+
+        $code = $code - 192 - ($bytesnumber > 2 ? 32 : 0) - ($bytesnumber > 3 ? 16 : 0);
+    }
+    return $code;
+}
+
+
 function shift_letter($character, $shift) {
-    $char_ascii = ord($character);
-    $shifted_char = ($char_ascii + $shift) % 26; //26 alphabetical characters
+    $char_unicode = ordutf8($character);
+    $shifted_char = ($char_unicode + $shift) % 26; //26 alphabetical characters
+
+    var_dump($char_unicode);
+    var_dump($shifted_char);
+    var_dump(chr($shifted_char));
+    exit;
+
     return chr($shifted_char);
 }
 
@@ -79,15 +108,20 @@ function calculate_cipher($shift, $direction, $phrase)
 
     $shifted_phrase = "";
 
-    for ($char_index = 0; $char_index < count($phrase); $char_index++) {
+    for ($char_index = 0; $char_index < strlen($phrase); $char_index++) {
         $current_char = $phrase[$char_index];
+
         if (preg_match('/[a-zA-Z]/' , $current_char)) {
             $shifted_phrase = $shifted_phrase . shift_letter($current_char, $shift);
+            // var_dump(shift_letter($current_char, $shift));
+            // var_dump($shifted_phrase);
+            // exit;
         }
         else {
             $shifted_phrase = $shifted_phrase . $current_char;
         }
     }
+
     return $shifted_phrase;
 }
 
