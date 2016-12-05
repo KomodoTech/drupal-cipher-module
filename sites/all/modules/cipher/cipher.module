@@ -134,6 +134,16 @@ function shift_letter($character, $shift) {
                             SHOULD END AT 68 ("D")
 
 
+                            DEFINING f(h, l):
+
+                            if (i + s >= 65)
+                            {
+                                return h;
+                            }
+                            else {
+                                return l;
+                            }
+
 
                 Shift Right (POSITIVE):
 
