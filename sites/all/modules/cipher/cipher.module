@@ -55,10 +55,7 @@ function element_validate_direction($element) {
 
 function element_validate_phrase($element) {
     $pattern_mostly_alpha = '/^[A-Z\'".?! ]+$/i';
-    if (preg_match($pattern_mostly_alpha, $element['#value'])) {
-        echo('Phrase seems fine');
-    }
-    else {
+    if (!preg_match($pattern_mostly_alpha, $element['#value'])) {
         form_error($element, t('Please do not use special characters that are not space or punctuation characters'));
     }
 }
@@ -82,7 +79,7 @@ function cipher_form_submit($form, &$form_state) {
     $form_state['redirect'] = 'cipher_success_page';
 }
 
-function sum_success() {
+function cipher_success() {
     $answer = $_SESSION['cipher_output'];
     return 'Your shifted phrase is: ' . $answer;
 }
